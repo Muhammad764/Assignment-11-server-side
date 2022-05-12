@@ -18,7 +18,7 @@ async function run() {
     try {
         await client.connect();
         const itemsCollection = client.db('bicycle').collection('items')
-
+        const orderCollection = client.db('bicycle').collection('order')
         app.get('/item', async (req, res) => {
             const query={}
             const cursor = itemsCollection.find(query)
@@ -38,13 +38,20 @@ async function run() {
             const newItems = req.body
             const result = await itemsCollection.insertOne(newItems)
             res.send(result)
-        })
+        }); 
 
         //Delete
         app.delete('/item/:id', async (req, res) => {
             const id = req.params.id
-            const query = {_id:ObjectId(id)}
+            const query = {_id: ObjectId(id)}
             const result = await itemsCollection.deleteOne(query)
+            res.send(result)
+        })
+
+        //order 
+        app.post('order', async (req, res) => {
+            const order = req.body
+            const result = await orderCollection.insertOne(order)
             res.send(result)
         })
     }
