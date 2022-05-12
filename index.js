@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config()
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000
@@ -19,6 +20,18 @@ async function run() {
         await client.connect();
         const itemsCollection = client.db('bicycle').collection('items')
         const orderCollection = client.db('bicycle').collection('order')
+
+        //Auth
+        app.post('/login', async (req, res) => {
+            const authHeader = req.headers.authorization
+            console.log(authHeader)
+            const user = req.body
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn:'1d'
+            })
+            res.send(accessToken)
+        })
+        //Item
         app.get('/item', async (req, res) => {
             const query={}
             const cursor = itemsCollection.find(query)
